@@ -1,62 +1,53 @@
 package com.sam.scheduler_api.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
 
+@Entity
+@Table(name = "courses")
 public class Course {
-    private String courseId; // e.g., "CSI 403"
-    private String name; // e.g., "Algorithms"
-    private double credits;
 
-    // NEW: The list of courses you must take Before this one
-    private List<Course> preRequisites;
+    @Id
+    private String courseId; // Primary Key
 
-    public Course(String courseId, String name, double credits) {
+    private String name;
+    private Double credits;
+
+    // JPA Constructor
+    public Course() {
+    }
+
+    // Standard Constructor
+    public Course(String courseId, String name, Double credits) {
         this.courseId = courseId;
         this.name = name;
         this.credits = credits;
-        this.preRequisites = new ArrayList<>(); // NEW: Initialize the list
     }
+
+    // Getters and Setters
 
     public String getCourseId() {
         return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 
     public String getName() {
         return name;
     }
 
-    //NEW: Method to add a requirement
-    public void addPreRequisite(Course preRequisite) {
-        preRequisites.add(preRequisite);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    //NEW: Method to get the list (so we can check it later)
-    public List<Course> getPreRequisites() {
-        return preRequisites;
-    }
-
-    public double getCredits() {
+    public Double getCredits() {
         return credits;
     }
 
-    @Override
-    public String toString() {
-        return courseId + ": " + name;
+    public void setCredits(Double credits) {
+        this.credits = credits;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Course course = (Course) o;
-        return Objects.equals(courseId, course.courseId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(courseId);
-    }
-
 }
