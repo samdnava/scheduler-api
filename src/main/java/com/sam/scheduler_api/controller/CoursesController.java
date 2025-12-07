@@ -2,6 +2,7 @@ package com.sam.scheduler_api.controller;
 
 import com.sam.scheduler_api.model.Course;
 import com.sam.scheduler_api.repository.CourseRepository;
+import com.sam.scheduler_api.service.CourseService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,20 +11,20 @@ import java.util.List;
 @RequestMapping("/courses")
 
 public class CoursesController {
-    private final CourseRepository courseRepository;
+    private final CourseService courseService;
 
-    public CoursesController(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
+    public CoursesController(CourseService courseService) {
+        this.courseService = courseService;
     }
 
     @GetMapping
     public List<Course> getAllCourse() {
-        return courseRepository.findAll();
+        return courseService.findAllCourses();
     }
 
     @PostMapping
     public Course createCourse(@RequestBody Course newCourse) {
-        return courseRepository.save(newCourse);
+        return courseService.saveCourse(newCourse);
     }
 
 }
