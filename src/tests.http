@@ -26,3 +26,6 @@ Content-Type: application/json
 ### Test 4: Enroll "New User" (999) into a Section (e.g., CRN-102)
 # Make sure CRN-102 actually exists in your DB!
 POST http://localhost:8080/students/999/enroll/CRN-102
+
+### Test 5: Try to enroll a NON-EXISTENT student (Should be 404)
+POST http://localhost:8080/students/BAD_ID_999/enroll/CRN-101
