@@ -1,5 +1,6 @@
 package com.sam.scheduler_api.controller;
 
+import com.sam.scheduler_api.dto.StudentResponseDTO;
 import com.sam.scheduler_api.model.Section;
 import com.sam.scheduler_api.model.Student;
 import com.sam.scheduler_api.repository.SectionRepository;
@@ -22,7 +23,7 @@ public class StudentController {
 
     // The Endpoint: GET / students
     @GetMapping
-    public List<Student> getAllStudents() {
+    public List<StudentResponseDTO> getAllStudents() {
         // This automatically converts the Java List to JSON
         return studentService.findAllStudents();
     }
@@ -30,13 +31,13 @@ public class StudentController {
     // Endpoint: POST /students
     // Action: Save a new student
     @PostMapping
-    public Student registerStudent(@RequestBody Student newStudent) {
+    public StudentResponseDTO registerStudent(@RequestBody Student newStudent) {
         return studentService.registerStudent(newStudent);
     }
 
     // Endpoint: POST /students/999/enroll/CRN-101
     @PostMapping("/{studentId}/enroll/{crn}")
-    public Student enrollStudent(@PathVariable String studentId, @PathVariable String crn) {
+    public StudentResponseDTO enrollStudent(@PathVariable String studentId, @PathVariable String crn) {
         return studentService.enrollStudent(studentId, crn);
     }
 

@@ -1,5 +1,6 @@
 package com.sam.scheduler_api.service;
 
+import com.sam.scheduler_api.dto.StudentResponseDTO;
 import com.sam.scheduler_api.exception.ResourceNotFoundException;
 import com.sam.scheduler_api.model.Section;
 import com.sam.scheduler_api.model.Student;
@@ -22,17 +23,19 @@ public class StudentService {
     }
 
     // Logic 1: Get all students
-    public List<Student> findAllStudents() {
-        return studentRepository.findAll();
+    public List<StudentResponseDTO> findAllStudents() {
+        return studentRepository.findAll()
+                .stream().map(StudentResponseDTO::fromEntity).toList();
     }
 
     // Logic 2: Register a new student
-    public Student registerStudent(Student newStudent) {
-        return studentRepository.save(newStudent);
+    public StudentResponseDTO registerStudent(Student newStudent) {
+        Student savedStudent = studentRepository.save(newStudent);
+        return StudentResponseDTO.fromEntity(savedStudent);
     }
 
     // Logic 3: The Complex Enrollment Logic (Moved from Controller)
-    public Student enrollStudent(String studentId, String crn) {
+    public StudentResponseDTO enrollStudent(String studentId, String crn) {
         // 1. Find the Student
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
@@ -41,7 +44,8 @@ public class StudentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found with CRN: " + crn));
         // 3. Link them
         student.getSchedule().add(section);
-        // 4. Save
-        return studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student);
+        // 4. Save and Return
+        return StudentResponseDTO.fromEntity(savedStudent);
     }
 }
