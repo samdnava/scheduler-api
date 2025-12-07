@@ -1,0 +1,28 @@
+
+### Test 1: Get all students (This is what your browser did)
+GET http://localhost:8080/students
+
+### Test 2: Create a New Student (The Post request)
+POST http://localhost:8080/students
+Content-type: application/json
+
+{
+  "id": "999",
+  "firstName": "New",
+  "lastName": "User",
+  "email": "new.user@test.com"
+}
+
+### Test 3: Create a NEW Course
+POST http://localhost:8080/courses
+Content-Type: application/json
+
+{
+  "courseId": "CSI 101",
+  "name": "Intro to Java",
+  "credits": 4.0
+}
+
+### Test 4: Enroll "New User" (999) into a Section (e.g., CRN-102)
+# Make sure CRN-102 actually exists in your DB!
+POST http://localhost:8080/students/999/enroll/CRN-102
