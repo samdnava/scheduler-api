@@ -20,7 +20,8 @@ public class CourseService {
         return courseRepository.findAll().stream().map(CourseResponseDTO::fromEntity).toList();
     }
 
-    public Course saveCourse(Course course) {
-        return courseRepository.save(course);
+    public CourseResponseDTO saveCourse(Course course) {
+        Course savedCourse = courseRepository.save(course);
+        return CourseResponseDTO.fromEntity(savedCourse);
     }
 }

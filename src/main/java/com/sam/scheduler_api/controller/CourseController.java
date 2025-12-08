@@ -24,7 +24,7 @@ public class CourseController {
     }
 
     @PostMapping
-    public Course createCourse(@RequestBody Course newCourse) {
+    public CourseResponseDTO createCourse(@RequestBody Course newCourse) {
         return courseService.saveCourse(newCourse);
     }
 
