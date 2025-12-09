@@ -1,10 +1,7 @@
 package com.sam.scheduler_api.controller;
 
 import com.sam.scheduler_api.dto.StudentResponseDTO;
-import com.sam.scheduler_api.model.Section;
 import com.sam.scheduler_api.model.Student;
-import com.sam.scheduler_api.repository.SectionRepository;
-import com.sam.scheduler_api.repository.StudentRepository;
 import com.sam.scheduler_api.service.StudentService;
 import org.springframework.web.bind.annotation.*;
 
