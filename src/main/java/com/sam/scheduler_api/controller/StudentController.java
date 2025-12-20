@@ -1,9 +1,12 @@
 package com.sam.scheduler_api.controller;
 
-import com.sam.scheduler_api.dto.StudentResponseDTO;
 import com.sam.scheduler_api.model.Student;
+import com.sam.scheduler_api.dto.StudentResponseDTO;
 import com.sam.scheduler_api.service.StudentService;
+
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -28,7 +31,9 @@ public class StudentController {
     // Endpoint: POST /students
     // Action: Save a new student
     @PostMapping
-    public StudentResponseDTO registerStudent(@RequestBody Student newStudent) {
+    // @Valid: Tells Spring "Check the newStudent against the rules in the Student class.
+    // If it fails, reject the request immediately."
+    public StudentResponseDTO registerStudent(@Valid @RequestBody Student newStudent) {
         return studentService.registerStudent(newStudent);
     }
 

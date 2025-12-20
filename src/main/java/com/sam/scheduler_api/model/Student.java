@@ -1,12 +1,8 @@
 package com.sam.scheduler_api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +12,22 @@ import java.util.List;
 public class Student {
 
     @Id
-    @Column(length = 20) // Equivalent to VARCHAR(20)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(nullable = false) // Equivalent to NOT NULL
+    // @NotBlank: Checks that the text is not null and length > 0
+    @NotBlank(message = "First name is mandatory")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @NotBlank(message = "Email should be valid")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(unique = true, nullable = false) // Unique constraint
+    // @Email: Uses a standard pattern to check for "text@domain.com"
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is mandatory")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     // --- 1. JPA REQUIRES AN EMPTY CONSTRUCTOR ---

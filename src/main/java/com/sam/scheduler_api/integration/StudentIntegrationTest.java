@@ -38,6 +38,17 @@ public class StudentIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fullName").value("Integration Test"))
                 .andExpect(jsonPath("$.email").value("test@test.com"));
+    }
 
+    @Test
+    public void shouldFailWhenFirstNameIsBlank() throws Exception {
+        // 1. ARRANGE - Create a student with an empty First Name
+        Student invalidStudent = new Student(null, "", "Test", "test@test.com");
+
+        // 2. ACT & ASSERT
+        mockMvc.perform(post("/students")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidStudent)))
+                .andExpect(status().isBadRequest()); // We expect HTTP 400 Error
     }
 }
