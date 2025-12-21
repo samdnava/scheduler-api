@@ -19,6 +19,8 @@ public class SectionService {
         return sectionRepository.findAll();
     }
 
+    public Section saveSection(Section section) {
+        return sectionRepository.save(section);
+    }
+
 }
-
-

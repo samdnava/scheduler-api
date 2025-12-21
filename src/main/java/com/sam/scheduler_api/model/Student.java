@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "students")
@@ -30,6 +30,25 @@ public class Student {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    // --- RELATIONSHIP: MANY-TO-MANY ---
+    // This tells the DB: "One student has many sections, and one section has many students."
+    // We use Set (instead of List) to prevent a student from enrolling in the same class twice.
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "enrollments", // This creates a middle table called 'enrollments'
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "section_crn")
+    )
+    private Set<Section> sections = new HashSet<>();
+
+    public Set<Section> getSections() {
+        return sections;
+    }
+
+    public void setSections(Set<Section> sections) {
+        this.sections = sections;
+    }
+
     // --- 1. JPA REQUIRES AN EMPTY CONSTRUCTOR ---
     public Student() {
     }
@@ -41,7 +60,6 @@ public class Student {
         this.lastName = lastName;
         this.email = email;
     }
-
 
     // --- 3. GETTERS AND SETTERS ---
     public String getId() {
@@ -76,24 +94,4 @@ public class Student {
         this.email = email;
     }
 
-    // --- NEW: The Schedule ---
-    // @ManyToMany: Tells the DB that Students and Sections have a complex relationship
-    // @JoinTable: Automatically creates the "enrollments" middle table for us
-    @ManyToMany
-    @JoinTable(
-            name = "enrollments",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "section_crn")
-    )
-    private List<Section> schedule = new ArrayList<>();
-
-    // Getter and Setter for the list
-    public List<Section> getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(List<Section> schedule) {
-        this.schedule = schedule;
-    }
 }
-

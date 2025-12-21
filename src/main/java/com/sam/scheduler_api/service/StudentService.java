@@ -6,6 +6,7 @@ import com.sam.scheduler_api.model.Section;
 import com.sam.scheduler_api.model.Student;
 import com.sam.scheduler_api.repository.SectionRepository;
 import com.sam.scheduler_api.repository.StudentRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class StudentService {
     }
 
     // Logic 2: Register a new student
+
     public StudentResponseDTO registerStudent(Student newStudent) {
         Student savedStudent = studentRepository.save(newStudent);
         return StudentResponseDTO.fromEntity(savedStudent);
@@ -43,7 +45,7 @@ public class StudentService {
         Section section = sectionRepository.findById(crn)
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found with CRN: " + crn));
         // 3. Link them
-        student.getSchedule().add(section);
+        student.getSections().add(section);
         Student savedStudent = studentRepository.save(student);
         // 4. Save and Return
         return StudentResponseDTO.fromEntity(savedStudent);

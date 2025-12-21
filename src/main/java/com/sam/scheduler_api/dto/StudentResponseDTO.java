@@ -19,7 +19,7 @@ public record StudentResponseDTO(String id,
 
         // 2. Transform the schedule list into just Course Names (Strings)
         // This is a "Stream" - it loops through the sections and grabs the course name
-        List<String> classNames = student.getSchedule().stream()
+        List<String> classNames = student.getSections().stream()
                 .map(section -> section.getCourse().getName())
                 .collect(Collectors.toList());
 

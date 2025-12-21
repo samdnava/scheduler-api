@@ -1,7 +1,7 @@
 package com.sam.scheduler_api.service;
 
-import com.sam.scheduler_api.dto.CourseResponseDTO;
 import com.sam.scheduler_api.model.Course;
+import com.sam.scheduler_api.dto.CourseResponseDTO;
 import com.sam.scheduler_api.repository.CourseRepository;
 import org.springframework.stereotype.Service;
 
