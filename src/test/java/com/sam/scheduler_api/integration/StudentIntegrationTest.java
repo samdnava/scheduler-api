@@ -74,7 +74,7 @@ public class StudentIntegrationTest {
     public void shouldEnrollStudent_EndToEnd() throws Exception {
         // 1. ARRANGE: Create the "World"
         // We need a Student, a Course, a Professor, and a Section in the DB first.
-        Student sam = new Student(null, "Sam", "Test", "sam.test@test.com");
+        Student sam = new Student(null, "Sam", "Test", "test@test.com");
         studentService.registerStudent(sam);
 
         // CAPTURE the saved DTO which contains the real, generated UUID
@@ -92,9 +92,19 @@ public class StudentIntegrationTest {
 
         // 2. ACT: Call the Enroll Endpoint
         mockMvc.perform(post("/students/" + generatedId + "/enroll/CRN-9999")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 // 3. ASSERT: Call the Enroll Endpoint
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.enrolledClasses[0]").value("Intro to Java"));
     }
+
+    @Test
+    public void shouldReturn404_WhenStudentNotFound() throws Exception {
+        // ACT & ASSERT
+        // We try to enroll a student with ID "non-existen-id" which definitely isn't in the DB.
+        mockMvc.perform(post("/students/non-existent-id/enroll/CRN-9999")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound()); // We expect a 404 error, not 200 or 500
+    }
+
 }
