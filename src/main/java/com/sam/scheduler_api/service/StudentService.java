@@ -1,6 +1,7 @@
 package com.sam.scheduler_api.service;
 
 import com.sam.scheduler_api.dto.StudentResponseDTO;
+import com.sam.scheduler_api.exception.AlreadyEnrolledException;
 import com.sam.scheduler_api.exception.ResourceNotFoundException;
 import com.sam.scheduler_api.model.Section;
 import com.sam.scheduler_api.model.Student;
@@ -44,6 +45,11 @@ public class StudentService {
         // 2. Find the Section
         Section section = sectionRepository.findById(crn)
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found with CRN: " + crn));
+
+        if (student.getSections().contains(section)){
+            throw new AlreadyEnrolledException("Student is already in section: " + crn);
+        }
+
         // 3. Link them
         student.getSections().add(section);
         Student savedStudent = studentRepository.save(student);

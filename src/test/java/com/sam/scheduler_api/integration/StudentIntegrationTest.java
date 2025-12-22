@@ -107,4 +107,26 @@ public class StudentIntegrationTest {
                 .andExpect(status().isNotFound()); // We expect a 404 error, not 200 or 500
     }
 
+    @Test
+    public void shouldReturn409_WhenStudentAlreadyEnrolled() throws Exception {
+        // 1. ARRANGE
+        Student student = new Student(null, "Double", "Entry", "double@test.com");
+        StudentResponseDTO savedStudent = studentService.registerStudent(student);
+        String studentId = savedStudent.id();
+
+        Course course = new Course("MATH-101", "Calculus", 4.0);
+        courseService.saveCourse(course);
+
+        // Use a unique CRN for this test to avoid conflicts with other tests
+        Section section = new Section("CRN-DUPE", course, null, "Tue/Thu", "2:00");
+        sectionService.saveSection(section);
+
+        // Enroll once (Success)
+        studentService.enrollStudent(studentId, "CRN-DUPE");
+
+        // 2. ACT & ASSERT (Enroll again -> Expect Failure
+        mockMvc.perform(post("/students/" + studentId + "/enroll/CRN-DUPE")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
 }
