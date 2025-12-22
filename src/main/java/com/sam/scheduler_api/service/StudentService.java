@@ -56,4 +56,42 @@ public class StudentService {
         // 4. Save and Return
         return StudentResponseDTO.fromEntity(savedStudent);
     }
+
+    public void removeStudentFromSection(String studentId, String crn) {
+        // 1. Find the Student
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + studentId));
+
+        // 2. Find the Section
+        Section section = sectionRepository.findById(crn)
+                .orElseThrow(() -> new ResourceNotFoundException("Section not found with CRN: " + crn));
+
+        // 3. Check if the relationship exists
+        if (!student.getSections().contains(section)) {
+            throw new ResourceNotFoundException("Student is not enrolled in section: " + crn);
+        }
+
+        // 4. Remove the relationship and Save
+        student.getSections().remove(section);
+        studentRepository.save(student);
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

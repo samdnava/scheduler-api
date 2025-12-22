@@ -4,6 +4,7 @@ import com.sam.scheduler_api.model.Student;
 import com.sam.scheduler_api.dto.StudentResponseDTO;
 import com.sam.scheduler_api.service.StudentService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -41,6 +42,13 @@ public class StudentController {
     @PostMapping("/{studentId}/enroll/{crn}")
     public StudentResponseDTO enrollStudent(@PathVariable String studentId, @PathVariable String crn) {
         return studentService.enrollStudent(studentId, crn);
+    }
+
+    // Endpoint: DELETE /students/{studentId}/enroll/{crn}
+    @DeleteMapping("/{studentId}/enroll/{crn}")
+    public ResponseEntity<Void> unenrollStudent(@PathVariable String studentId, @PathVariable String crn) {
+        studentService.removeStudentFromSection(studentId, crn);
+        return ResponseEntity.noContent().build();
     }
 
 }

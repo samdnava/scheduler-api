@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 // These static imports allow us to use post() and jsonPath() directly
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -129,4 +130,27 @@ public class StudentIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
+
+    @Test
+    public void  shouldUnenrollStudent_WhenEnrolled() throws Exception {
+        // 1. ARRANGE
+        Student student = new Student (null, "Drop", "Class", "drop.class@test.com");
+        StudentResponseDTO savedStudent = studentService.registerStudent(student);
+        String studentId = savedStudent.id();
+
+        Course course = new Course("HIST-101", "History", 3.0);
+        courseService.saveCourse(course);
+
+        // Unique CRN
+        Section section = new Section("CRN-DROP", course, null, "Fri", "9:00AM");
+        sectionService.saveSection(section);
+
+        // Enroll first (Setup)
+        studentService.enrollStudent(studentId, "CRN-DROP");
+
+        // 2. ACT & ASSERT (Unenroll -> Expect 204 No Content)
+        mockMvc.perform(delete("/students/" + studentId + "/enroll/CRN-DROP"))
+                .andExpect(status().isNoContent());
+    }
+
 }
