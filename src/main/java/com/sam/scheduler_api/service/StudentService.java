@@ -2,6 +2,7 @@ package com.sam.scheduler_api.service;
 
 import com.sam.scheduler_api.dto.StudentResponseDTO;
 import com.sam.scheduler_api.exception.AlreadyEnrolledException;
+import com.sam.scheduler_api.exception.CourseFullException;
 import com.sam.scheduler_api.exception.ResourceNotFoundException;
 import com.sam.scheduler_api.model.Section;
 import com.sam.scheduler_api.model.Student;
@@ -37,7 +38,8 @@ public class StudentService {
         return StudentResponseDTO.fromEntity(savedStudent);
     }
 
-    // Logic 3: The Complex Enrollment Logic (Moved from Controller)
+    // Logic 3: The Complex Enrollment Logic
+    @Transactional
     public StudentResponseDTO enrollStudent(String studentId, String crn) {
         // 1. Find the Student
         Student student = studentRepository.findById(studentId)
@@ -45,15 +47,22 @@ public class StudentService {
         // 2. Find the Section
         Section section = sectionRepository.findById(crn)
                 .orElseThrow(() -> new ResourceNotFoundException("Section not found with CRN: " + crn));
-
-        if (student.getSections().contains(section)){
+        // 3. Check if already enrolled
+        if (student.getSections().contains(section)) {
             throw new AlreadyEnrolledException("Student is already in section: " + crn);
         }
+        // 4. Check Capacity
+        // We use >= because we are about to add the +1st student
+        if (section.getStudents().size() >= section.getCapacity()) {
+            throw new CourseFullException("Section " + crn + " is full!");
+        }
 
-        // 3. Link them
+        // 5. Link them
         student.getSections().add(section);
+        section.getStudents().add(student);
+
+        // 6. Save and Return
         Student savedStudent = studentRepository.save(student);
-        // 4. Save and Return
         return StudentResponseDTO.fromEntity(savedStudent);
     }
 
@@ -74,24 +83,6 @@ public class StudentService {
         // 4. Remove the relationship and Save
         student.getSections().remove(section);
         studentRepository.save(student);
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

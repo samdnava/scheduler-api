@@ -48,7 +48,7 @@ public class StudentIntegrationTest {
     @Test
     public void shouldCreateStudent_EndToEnd() throws Exception {
         // 1. ARRANGE
-        Student newStudent = new Student("999", "Integration", "Test", "test@test.com");
+        Student newStudent = new Student(null, "Integration", "Test", "test@test.com");
 
         // 2. ACT & ASSERT
         mockMvc.perform(post("/students")
@@ -127,14 +127,14 @@ public class StudentIntegrationTest {
 
         // 2. ACT & ASSERT (Enroll again -> Expect Failure
         mockMvc.perform(post("/students/" + studentId + "/enroll/CRN-DUPE")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
 
     @Test
-    public void  shouldUnenrollStudent_WhenEnrolled() throws Exception {
+    public void shouldUnenrollStudent_WhenEnrolled() throws Exception {
         // 1. ARRANGE
-        Student student = new Student (null, "Drop", "Class", "drop.class@test.com");
+        Student student = new Student(null, "Drop", "Class", "drop.class@test.com");
         StudentResponseDTO savedStudent = studentService.registerStudent(student);
         String studentId = savedStudent.id();
 
@@ -153,4 +153,31 @@ public class StudentIntegrationTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void shouldReturn400_WhenSectionIsFull() throws Exception {
+        // 1. ARRANGE
+        // Create two students
+        Student s1 = new Student(null, "Student", "One", "s1@test.com");
+        String id1 = studentService.registerStudent(s1).id();
+
+        Student s2 = new Student(null, "Student", "Two", "s2@test.com");
+        String id2 = studentService.registerStudent(s2).id();
+
+        Course course = new Course("PHY-101", "Physics", 3.0);
+        courseService.saveCourse(course);
+
+        // Create a Section with Capacity = 1
+        Section section = new Section("CRN-FULL", course, null, "Fri", "2:00 PM");
+        section.setCapacity(1);
+        sectionService.saveSection(section);
+
+        // Enroll Student 1 (Success - now the class is full)
+        studentService.enrollStudent(id1, "CRN-FULL");
+
+        // 2. ACT & ASSERT
+        // Try to enroll Student 2 -> Should fail with 400 Bad Request
+        mockMvc.perform(post("/students/" + id2 + "/enroll/CRN-FULL")
+                        .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isBadRequest()); // Expect HTTP 400
+    }
 }

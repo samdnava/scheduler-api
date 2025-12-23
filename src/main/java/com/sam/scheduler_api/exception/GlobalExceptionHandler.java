@@ -36,4 +36,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(CourseFullException.class)
+    public ResponseEntity<Object> handleCourseFull(CourseFullException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+        body.put("status", 400);
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }

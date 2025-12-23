@@ -20,11 +20,11 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("--- LOADING DATA ---");
 
         // 1. Create a student
-        Student sam = new Student("101", "Sam", "N", "sam@test.com");
+        Student student = new Student(null, "Student", "Test", "test@test.com");
 
         // 2. Save it using the Service (which handles DTO conversion logic)
-        studentService.registerStudent(sam);
+        studentService.registerStudent(student);
 
-        System.out.println("Saved Student: " + sam.getFirstName());
+        System.out.println("Saved Student: " + student.getFirstName());
     }
 }

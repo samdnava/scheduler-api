@@ -50,5 +50,4 @@ public class StudentController {
         studentService.removeStudentFromSection(studentId, crn);
         return ResponseEntity.noContent().build();
     }
-
 }
