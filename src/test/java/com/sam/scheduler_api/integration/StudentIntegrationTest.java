@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 // These static imports allow us to use post() and jsonPath() directly
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -178,6 +179,66 @@ public class StudentIntegrationTest {
         // Try to enroll Student 2 -> Should fail with 400 Bad Request
         mockMvc.perform(post("/students/" + id2 + "/enroll/CRN-FULL")
                         .contentType(MediaType.APPLICATION_JSON))
-                 .andExpect(status().isBadRequest()); // Expect HTTP 400
+                .andExpect(status().isBadRequest()); // Expect HTTP 400
+    }
+
+    @Test
+    public void shouldReturnSchedule_WhenEnrolled() throws Exception {
+        // 1. ARRANGE
+        Student student = new Student(null, "Schedule", "Check", "schedule@test.com");
+        String studentId = studentService.registerStudent(student).id();
+
+        Course course = new Course("BIO-101", "Biology", 4.0);
+        courseService.saveCourse(course);
+
+        // Create a dummy professor
+        Professor professor = new Professor("prof-bio", "Dr. Darwin", "Biology");
+        professorService.saveProfessor(professor);
+
+        // Create a specific section
+        Section section = new Section("CRN-BIO", course, professor, "Mon/Fri", "11:00 AM");
+        sectionService.saveSection(section);
+
+        // Enroll the student
+        studentService.enrollStudent(studentId, "CRN-BIO");
+
+        // 2. ACT & ASSERT
+        // We call the NEW endpoint and check if it contains the course name "Biology"
+        mockMvc.perform(get("/students/" + studentId + "/schedule")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].courseName").value("Biology"))
+                .andExpect(jsonPath("$[0].professorName").value("Dr. Darwin"))
+                .andExpect(jsonPath("$[0].timeOfDay").value("11:00 AM"));
+    }
+
+    @Test
+    public void shouldReturn409_WhenTimeConflictOccurs() throws Exception {
+        // 1. ARRANGE
+        Student sam = new Student(null, "Busy", "Student", "busy@test.com");
+        String studentId = studentService.registerStudent(sam).id();
+
+        Course bio = new Course("BIO-101", "Biology", 4.0);
+        courseService.saveCourse(bio);
+
+        Course hist = new Course("HIST-101", "History", 3.0);
+        courseService.saveCourse(hist);
+
+        // Class 1: Monday at 10:00 AM
+        Section section1 = new Section("CRN-BIO", bio, null, "Monday", "10:00 AM");
+        sectionService.saveSection(section1);
+
+        // Class 2: Monday at 10:00 AM (Conflict!)
+        Section section2 = new Section("CRN-HIST", hist, null, "Monday", "10:00 AM");
+        sectionService.saveSection(section2);
+
+        // Enroll in Class 1 (Success)
+        studentService.enrollStudent(studentId, "CRN-BIO");
+
+        // 2. ACT & ASSERT
+        // Try to enroll in Class 2 -> Should fail with 409 Conflict
+        mockMvc.perform(post("/students/" + studentId + "/enroll/CRN-HIST")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
     }
 }
