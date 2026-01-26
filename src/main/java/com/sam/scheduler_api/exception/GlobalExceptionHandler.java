@@ -46,4 +46,14 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(TimeConflictException.class)
+    public ResponseEntity<Object> handleTimeConflict(TimeConflictException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
+        body.put("status", 409);
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
 }

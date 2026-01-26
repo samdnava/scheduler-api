@@ -2,6 +2,7 @@ package com.sam.scheduler_api.controller;
 
 import com.sam.scheduler_api.model.Student;
 import com.sam.scheduler_api.dto.StudentResponseDTO;
+import com.sam.scheduler_api.dto.ScheduleItemDTO;
 import com.sam.scheduler_api.service.StudentService;
 
 import org.springframework.http.ResponseEntity;
@@ -22,11 +23,17 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    // The Endpoint: GET / students
+    // Endpoint: GET /students
     @GetMapping
     public List<StudentResponseDTO> getAllStudents() {
         // This automatically converts the Java List to JSON
         return studentService.findAllStudents();
+    }
+
+    // Endpoint: GET /student/{id}/schedule
+    @GetMapping("/{studentId}/schedule")
+    public List<ScheduleItemDTO> getStudentSchedule(@PathVariable String studentId) {
+        return studentService.getStudentSchedule(studentId);
     }
 
     // Endpoint: POST /students
